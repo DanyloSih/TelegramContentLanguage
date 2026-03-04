@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramContentLanguage", "TelegramContentLanguage.csproj", "{AFDEE1A4-AC5B-4A98-B7F8-01693A3D2E7D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleContentLanguage", "..\SimpleContentLanguage\SimpleContentLanguage.csproj", "{ECDDC870-09E7-40AC-A39F-B29790CB736A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AFDEE1A4-AC5B-4A98-B7F8-01693A3D2E7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFDEE1A4-AC5B-4A98-B7F8-01693A3D2E7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFDEE1A4-AC5B-4A98-B7F8-01693A3D2E7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFDEE1A4-AC5B-4A98-B7F8-01693A3D2E7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECDDC870-09E7-40AC-A39F-B29790CB736A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECDDC870-09E7-40AC-A39F-B29790CB736A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECDDC870-09E7-40AC-A39F-B29790CB736A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECDDC870-09E7-40AC-A39F-B29790CB736A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BD70ADA8-7A2D-4767-AA56-7DBF28A75B42}
+	EndGlobalSection
+EndGlobal
