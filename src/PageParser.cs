@@ -1,55 +1,34 @@
-﻿using System.Text;
-using SimpleContentLanguage;
+﻿using SimpleContentLanguage;
 
 namespace TelegramContentLanguage
 {
-    public class PageParser : IElementParser
+    public class PageParser : ElementParser
     {
-        private readonly PagesContainer _pagesContainer;
-        private readonly BlockRecognizer _recognizer;
-        private readonly string _incorrectArgumentsCountErrorMessageFormat;
+        private PagesContainer _pagesContainer;
+        private BlockRecognizer _recognizer;
+        private TCLErrorsConfig _tclErrorsConfig;
 
-        public IElementRecognizer ElementRecognizer { get => _recognizer; }
-
-        /// <param name="recognizer"></param>
-        /// <param name="pagesContainer"></param>
-        /// <param name="incorrectArgumentsCountErrorMessageFormat">
-        /// {0} - Element type; {1} - Expected arguments count; 
-        /// {2} - Start token line id (row); {3} - Start token position (column)</param>
         public PageParser(
-            BlockRecognizer recognizer,
             PagesContainer pagesContainer,
-            string incorrectArgumentsCountErrorMessageFormat)
+            BlockRecognizer recognizer,
+            TCLErrorsConfig tclErrorsConfig) : base(recognizer, 2, tclErrorsConfig)
         {
             _pagesContainer = pagesContainer;
             _recognizer = recognizer;
-            _incorrectArgumentsCountErrorMessageFormat = incorrectArgumentsCountErrorMessageFormat;
+            _tclErrorsConfig = tclErrorsConfig;
         }
 
-        public Result Parse(TokenizedBlock tokenizedBlock, TokenBounds elementBounds)
-        {
-            if (!tokenizedBlock.TryGetNextTokenInBounds(elementBounds.StartToken, elementBounds, out Token pathToken)
-             || !tokenizedBlock.TryGetNextTokenInBounds(pathToken, elementBounds, out Token buttonNameToken)
-             || buttonNameToken.Value.Equals(elementBounds.EndToken.Value))
-            {
-                return new Result(false, string.Format(
-                    _incorrectArgumentsCountErrorMessageFormat, 
-                    _recognizer.StartToken,
-                    2,
-                    elementBounds.StartToken.SourceLineId + 1,
-                    elementBounds.StartToken.FirstCharPositionInSourceLine));
-            }
-
-            
+        protected override Result OnParse(Token[] args, TokenizedBlock tokenizedBlock, TokenBounds elementBounds)
+        {           
             string content = string.Empty;
 
-            if (tokenizedBlock.TryGetNextTokenInBounds(buttonNameToken, elementBounds, out Token contentStart)
+            if (tokenizedBlock.TryGetNextTokenInBounds(args[1], elementBounds, out Token contentStart)
              && tokenizedBlock.TryGetPreviousTokenInBounds(elementBounds.EndToken, elementBounds, out Token contentEnd))
             {
                 content = tokenizedBlock.CreateMergedMetaLinesInBounds(new TokenBounds(contentStart, contentEnd));
             }
 
-            _pagesContainer.SetPage(new Page(pathToken.Value, buttonNameToken.Value, content.ToString()));
+            _pagesContainer.SetPage(new Page(args[0], args[1].Text, content.ToString()));
 
             return new Result(true, string.Empty);
         }

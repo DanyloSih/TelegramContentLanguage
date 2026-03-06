@@ -1,13 +1,15 @@
-﻿namespace TelegramContentLanguage
+﻿using SimpleContentLanguage;
+
+namespace TelegramContentLanguage
 {
     public class Page
     {
-        public readonly string Path;
+        public readonly Token Path;
 
         public string Name;
         public string Content;
 
-        public Page(string path, string name, string content)
+        public Page(Token path, string name, string content)
         {
             Path = path;
             Name = name;
