@@ -2,16 +2,16 @@
 
 namespace TelegramContentLanguage
 {
-    public class PageParser : ElementParser
+    public class MainParser : ElementParser
     {
         private PagesContainer _pagesContainer;
         private BlockRecognizer _recognizer;
         private TCLErrorsConfig _tclErrorsConfig;
 
-        public PageParser(
+        public MainParser(
             PagesContainer pagesContainer,
             BlockRecognizer recognizer,
-            TCLErrorsConfig tclErrorsConfig) : base(recognizer, 2, tclErrorsConfig)
+            TCLErrorsConfig tclErrorsConfig) : base(recognizer, 1, tclErrorsConfig)
         {
             _pagesContainer = pagesContainer;
             _recognizer = recognizer;
@@ -19,16 +19,16 @@ namespace TelegramContentLanguage
         }
 
         protected override Result OnParse(Token[] args, TokenizedBlock tokenizedBlock, TokenBounds elementBounds)
-        {           
+        {
             string content = string.Empty;
 
-            if (tokenizedBlock.TryGetNextTokenInBounds(args[1], elementBounds, out Token contentStart)
+            if (tokenizedBlock.TryGetNextTokenInBounds(args[0], elementBounds, out Token contentStart)
              && tokenizedBlock.TryGetPreviousTokenInBounds(elementBounds.EndToken, elementBounds, out Token contentEnd))
             {
                 content = tokenizedBlock.CreateMergedMetaLinesInBounds(new TokenBounds(contentStart, contentEnd));
             }
 
-            _pagesContainer.SetPage(new Page(args[1].Text, content), args[0]);
+            _pagesContainer.MainPageNode = new PageNode([""], "", new Page(args[0].Text, content), new());
 
             return new Result(true, string.Empty);
         }

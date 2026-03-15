@@ -2,11 +2,20 @@
 {
     public class PageNode
     {
+        public readonly string[] PathSegments;
+        public readonly string Path;
+
         public Page? Page;
         public Dictionary<string, PageNode> Children;
 
-        public PageNode(Page? page, Dictionary<string, PageNode> children)
+        public PageNode(
+            string[] pathSegments, 
+            string path, 
+            Page? page, 
+            Dictionary<string, PageNode> children)
         {
+            PathSegments = pathSegments;
+            Path = path;
             Page = page;
             Children = children;
         }

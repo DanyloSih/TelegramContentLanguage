@@ -7,6 +7,5 @@
 
         public string MainStartToken = "MAIN";
         public string MainEndToken = "END";
-        public string MainPageName = "Головне меню";
     }
 }
