@@ -28,7 +28,7 @@ namespace TelegramContentLanguage
                 content = tokenizedBlock.CreateMergedMetaLinesInBounds(new TokenBounds(contentStart, contentEnd));
             }
 
-            _pagesContainer.MainPageNode = new PageNode([""], "", new Page(args[0].Text, content), new());
+            _pagesContainer.MainPageNode.Page = new Page(args[0].Text, content);
 
             return new Result(true, string.Empty);
         }

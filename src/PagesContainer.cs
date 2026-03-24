@@ -1,12 +1,11 @@
 ﻿using System.Text;
-using System.Xml.Linq;
 using SimpleContentLanguage;
 
 namespace TelegramContentLanguage
 {
     public class PagesContainer
     {
-        public PageNode? MainPageNode;
+        public readonly PageNode MainPageNode;
 
         private Dictionary<string, PageNode> _pathNodeAssociations;
         private TCLParsingConfig _parsingConfig;
@@ -14,44 +13,46 @@ namespace TelegramContentLanguage
 
         public PagesContainer(TCLParsingConfig parsingConfig, TCLErrorsConfig errorsConfig)
         {
-            MainPageNode = null;
-
-            _pathNodeAssociations = new();
+            MainPageNode = new PageNode(["main"], "main", null, new(), null);
+            _pathNodeAssociations = new() { { MainPageNode.Path, MainPageNode } };
             _parsingConfig = parsingConfig;
             _errorsConfig = errorsConfig;
         }
 
-        public void CheckMainPageNodeInitialization()
+        public void Clear()
         {
-            if (MainPageNode == null || MainPageNode.Page == null)
-            {
-                throw new InvalidOperationException($"Before using \"{nameof(PagesContainer)}\", " +
-                    $"you should manualy initialize field \"{nameof(MainPageNode)}\" " +
-                    $"by node with not null Page value!");
-            }
+            _pathNodeAssociations.Clear();
+            MainPageNode.Children.Clear();
+            _pathNodeAssociations.Add(MainPageNode.Path, MainPageNode);
         }
 
         public IEnumerable<PageNode> IterateHierarchy(PageNode targetNode)
         {
-            CheckMainPageNodeInitialization();
-
             if (targetNode == null)
             {
                 yield break;
             }
 
-            if (targetNode == MainPageNode)
-            {
-                yield return MainPageNode;
-            }
+            PageNode? node = MainPageNode;
 
-            //targetNode.Page.Path.Text.Split();
+            yield return node;
+
+            for (int i = 0; i < targetNode.PathSegments.Length; i++)
+            {
+                string segment = targetNode.PathSegments[i];   
+                
+                if (!node.Children.TryGetValue(segment, out node))
+                {
+                    throw new InvalidOperationException(
+                        $"Hierarchy inconsistency: segment '{segment}' was not found among children of node '{node?.Path}'.");
+                }
+
+                yield return node;
+            }       
         }
 
         public Result SetPage(Page page, Token pathToken)
         {
-            CheckMainPageNodeInitialization();
-
             string path = pathToken.Text;
             string[] pathSegments = path.Split(_parsingConfig.PathSeparator);
             int lastId = pathSegments.Length - 1;
@@ -70,14 +71,14 @@ namespace TelegramContentLanguage
             }
 
             Dictionary<string, PageNode> nodeChildren = MainPageNode!.Children;
-
+            PageNode? parent = MainPageNode;
             for (int i = 0; i < pathSegments.Length; i++)
             {
                 string pathSegment = pathSegments[i];
 
                 if (i == lastId)
                 {
-                    PageNode node = new PageNode(pathSegments, path, page, new());
+                    PageNode node = new PageNode(pathSegments, path, parent, new(), page);
                     nodeChildren[pathSegment] = node;
                     _pathNodeAssociations[path] = node;
                 }
@@ -85,11 +86,12 @@ namespace TelegramContentLanguage
                 {
                     if (!nodeChildren.TryGetValue(pathSegment, out PageNode? child))
                     {
-                        child = new PageNode(pathSegments, path, null, new());
+                        child = new PageNode(pathSegments, path, parent, new(), null);
                         nodeChildren[pathSegment] = child;
                         _pathNodeAssociations[path] = child;
                     }
 
+                    parent = child;
                     nodeChildren = child.Children;
                 }
             }
@@ -104,9 +106,9 @@ namespace TelegramContentLanguage
 
         public bool TryGetPageNode(string[] pathSegments, out PageNode? node)
         {
-            CheckMainPageNodeInitialization();
-
-            if (pathSegments == null)
+            if (pathSegments == null 
+             || pathSegments.Length == 0 
+             || pathSegments[0].Equals(MainPageNode.Path))
             {
                 node = MainPageNode!;
                 return true;
@@ -130,7 +132,6 @@ namespace TelegramContentLanguage
 
         public override string ToString()
         {
-            CheckMainPageNodeInitialization();
             StringBuilder sb = new StringBuilder();
 
             string rootName = MainPageNode!.Page!.Name;
